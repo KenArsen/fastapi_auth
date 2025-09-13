@@ -1,0 +1,10 @@
+.idea/
+.env
+sqlite.db
+logs/
+*.log
+*.pot
+*.pyc
+__pycache__/
+.DS_Store
+.vscode/
