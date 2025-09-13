@@ -1,12 +1,12 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from passlib.context import CryptContext
-from src.models.base import Base
+from src.models.base import Base, TimeStampMixin
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class Account(Base):
+class Account(Base, TimeStampMixin):
     username: Mapped[str] = mapped_column(String(100), nullable=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
