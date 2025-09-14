@@ -4,7 +4,6 @@ from annotated_types import MinLen, MaxLen
 from pydantic import BaseModel, EmailStr
 
 
-# ---------- Base ----------
 class AccountBaseShema(BaseModel):
     email: Annotated[str, EmailStr, MinLen(1), MaxLen(255)]
     password: Annotated[str, MinLen(1), MaxLen(100)]
@@ -16,7 +15,6 @@ class AccountBaseShema(BaseModel):
     }
 
 
-# ---------- Create / Register ----------
 class AccountCreateShema(AccountBaseShema):
     username: Annotated[str, MinLen(1), MaxLen(100)]
 
@@ -31,12 +29,10 @@ class AccountCreateShema(AccountBaseShema):
     }
 
 
-# ---------- Login ----------
 class AccountLoginShema(AccountBaseShema):
     pass
 
 
-# ---------- Read ----------
 class AccountReadShema(AccountBaseShema):
     id: int
     username: Annotated[str | None, MinLen(1), MaxLen(100)] = None

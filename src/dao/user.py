@@ -1,17 +1,18 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.user import Account
+from src.dao.base import BaseDAO
 
-class AccountCRUD:
-    @staticmethod
-    async def get_by_email(session: AsyncSession, email: str) -> Account | None:
-        result = await session.execute(select(Account).where(Account.email == email))
+
+class AccountDAO(BaseDAO):
+    def __init__(self, session):
+        super().__init__(Account, session)
+
+    async def get_by_email(self, email: str) -> Account | None:
+        result = await self.session.execute(
+            select(self.model).where(self.model.email == email)
+        )
         return result.scalar_one_or_none()
 
-    @staticmethod
-    async def create(session: AsyncSession, account: Account) -> Account:
+    async def create(self, account: Account) -> Account:
         account.set_password(account.password)
-        session.add(account)
-        await session.commit()
-        await session.refresh(account)
-        return account
+        return await super().create(account)
