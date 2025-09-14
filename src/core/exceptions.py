@@ -48,6 +48,7 @@ class InvalidTokenException(HTTPException):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Недействительный токен доступа",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
 
@@ -56,6 +57,7 @@ class InvalidTokenPayloadException(HTTPException):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Некорректная структура токена (payload)",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
 

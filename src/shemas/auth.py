@@ -9,7 +9,7 @@ class AccountBaseShema(BaseModel):
 
 
 class AccountCreateShema(AccountBaseShema):
-    username: Annotated[str, MinLen(1), MaxLen(100)]
+    username: str | None = None
     password: Annotated[str, MinLen(1), MaxLen(100)]
 
     model_config = {
@@ -25,12 +25,20 @@ class AccountCreateShema(AccountBaseShema):
 
 class AccountLoginShema(AccountBaseShema):
     password: Annotated[str, MinLen(1), MaxLen(100)]
-    pass
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "email": "arsen@gmail.com",
+                "password": "arsen2002",
+            }
+        }
+    }
 
 
 class AccountReadShema(AccountBaseShema):
     id: int
-    username: Annotated[str | None, MinLen(1), MaxLen(100)] = None
+    username: str | None = None
 
     model_config = {
         "from_attributes": True,
