@@ -12,7 +12,3 @@ class AccountDAO(BaseDAO):
             select(self.model).where(self.model.email == email)
         )
         return result.scalar_one_or_none()
-
-    async def create(self, account: Account) -> Account:
-        account.set_password(account.password)
-        return await super().create(account)

@@ -1,9 +1,6 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-from passlib.context import CryptContext
 from src.models.base import Base, TimeStampMixin
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Account(Base, TimeStampMixin):
@@ -16,9 +13,3 @@ class Account(Base, TimeStampMixin):
 
     def __repr__(self) -> str:
         return str(self)
-
-    def set_password(self, password: str) -> None:
-        self.password = pwd_context.hash(password)
-
-    def verify_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.password)
