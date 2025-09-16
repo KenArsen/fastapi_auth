@@ -1,12 +1,11 @@
-from typing import List, TYPE_CHECKING
+from typing import List
 from fastapi import Depends
 
 from src.api.deps import CurrentUserDep
 from src.core.exceptions import ForbiddenException
 
-if TYPE_CHECKING:
-    from src.models.user import Account
-    from src.models.enam import Role
+from src.models.user import Account
+from src.models.enam import Role
 
 
 def require_roles(*roles: Role):
