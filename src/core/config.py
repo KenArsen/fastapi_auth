@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     DB_PASS: str
     CORS_ORIGINS: List[str] = ["*"]
     COOKIE_SECURE: bool = False
-    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
+    JWT_SECRET_KEY: str
     JWT_ACCESS_COOKIE_NAME: str
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

@@ -1,7 +1,7 @@
 from src.dao.user import AccountDAO
 from src.models.user import Account
-from src.shemas.auth import AccountCreateShema, AccountLoginShema
-from src.shemas.token import TokenShema
+from src.schemas.auth import AccountCreateSchema, AccountLoginSchema
+from src.schemas.token import TokenSchema
 from src.core.exceptions import (
     UserAlreadyExistsException,
     InvalidEmailOrPasswordException,
@@ -14,7 +14,7 @@ class AuthService:
     def __init__(self, dao: AccountDAO):
         self.dao = dao
 
-    async def register(self, data: AccountCreateShema) -> Account:
+    async def register(self, data: AccountCreateSchema) -> Account:
         existing = await self.dao.get_by_email(data.email)
         if existing:
             raise UserAlreadyExistsException()
@@ -24,7 +24,7 @@ class AuthService:
 
         return await self.dao.create(account)
 
-    async def login(self, data: AccountLoginShema) -> TokenShema:
+    async def login(self, data: AccountLoginSchema) -> TokenSchema:
         account = await self.dao.get_by_email(data.email)
         if account is None or not verify_password(data.password, account.password):
             raise InvalidEmailOrPasswordException()

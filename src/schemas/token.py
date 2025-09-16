@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
 
-class TokenShema(BaseModel):
+class TokenSchema(BaseModel):
     access_token: str
     token_type: str
