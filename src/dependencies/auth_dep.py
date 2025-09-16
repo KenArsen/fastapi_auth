@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from src.core.config import settings
-from src.core.deps import SessionDep
+from src.dependencies.dao_dep import SessionDep
 from src.core.exceptions import (
     InvalidTokenPayloadException,
     InvalidTokenException,

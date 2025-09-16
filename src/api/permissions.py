@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import Depends
 
-from src.api.deps import CurrentUserDep
+from src.dependencies.auth_dep import CurrentUserDep
 from src.core.exceptions import ForbiddenException
 
 from src.models.user import Account

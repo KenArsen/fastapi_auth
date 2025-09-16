@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response
-from src.core.deps import SessionDep
-from src.api.deps import CurrentUserDep
+from src.dependencies.dao_dep import SessionDep
+from src.dependencies.auth_dep import CurrentUserDep
 from src.dao.user import AccountDAO
 from src.services.auth import AuthService
 from src.shemas.auth import AccountCreateShema, AccountLoginShema, AccountReadShema
