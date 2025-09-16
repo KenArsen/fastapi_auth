@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from src.core.config import settings
 from src.core.logger import setup_logging
+from src.accounts.api.v1 import router as accounts_router
 
 
 class AppInitializer:
@@ -11,7 +11,8 @@ class AppInitializer:
 
     def setup(self):
         self._setup_cors()
-        setup_logging()
+        self._setup_logger()
+        self._setup_routers()
 
     def _setup_cors(self):
         self.app.add_middleware(
@@ -22,6 +23,8 @@ class AppInitializer:
             allow_headers=["*"],
         )
 
-    @staticmethod
-    def _setup_logger():
+    def _setup_logger(self):
         setup_logging()
+
+    def _setup_routers(self):
+        self.app.include_router(accounts_router, prefix="/api/v1")

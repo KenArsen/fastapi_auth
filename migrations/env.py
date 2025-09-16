@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from src.core.config import settings
-from src.models.base import Base
-from src.models.user import Account  # noqa
+from src.core.models import Base
+from src.accounts.models import Account  # noqa
 
 config = context.config
 
