@@ -1,4 +1,3 @@
-from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,12 +18,12 @@ class Settings(BaseSettings):
     DB_PASS: str = "postgres"
 
     # CORS
-    CORS_ORIGINS: Union[List[str], str] = ["*"]
+    CORS_ORIGINS: list[str] | str = ["*"]
 
     # Cookies / JWT
     COOKIE_SECURE: bool = False
     JWT_ALGORITHM: str = "HS256"
-    JWT_SECRET_KEY: Optional[str] = None
+    JWT_SECRET_KEY: str | None = None
     JWT_ACCESS_COOKIE_NAME: str = "access_token"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

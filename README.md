@@ -132,6 +132,33 @@
   uvicorn src.main:app --reload
 ```
 
+## Кодстайл и линтеры (PEP8)
+
+В проекте используется следующий набор инструментов для соответствия PEP8 и поддержания единого стиля кода:
+
+- Black — автоформатирование кода (PEP 8 совместимо)
+- Ruff — быстрый линтер (включает правила pycodestyle E/W, Pyflakes F) и сортировщик импортов (аналог isort)
+
+Конфигурация уже добавлена в pyproject.toml:
+- [tool.black] — line-length=120, target-version=py312
+- [tool.ruff] — line-length=120, target-version=py312, включены наборы правил: E, W, F, I, UP, B
+
+Как запускать:
+
+Через Poetry:
+```bash
+poetry run black .
+poetry run ruff check .            # проверить
+poetry run ruff check --fix .      # автоматически исправить то, что можно
+poetry run ruff check --select I --fix .  # только сортировка импортов
+```
+
+Через Makefile:
+```bash
+make format   # Black + сортировка импортов (Ruff)
+make lint     # Линтинг Ruff (PEP8 и др.)
+```
+
 ## Docker (замечание)
 
 В репозитории есть Dockerfile, однако в нём указана строка COPY ./app /code/app, в то время как исходный код находится в

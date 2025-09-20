@@ -1,12 +1,11 @@
-from src.accounts.repositories import AccountRepository
 from src.accounts.models import Account
-from src.accounts.schemas import RegistrationIn, LoginIn, TokenOut
-from src.accounts.security import hash_password, verify_password
+from src.accounts.repositories import AccountRepository
+from src.accounts.schemas import LoginIn, RegistrationIn, TokenOut
+from src.accounts.security import create_access_token, hash_password, verify_password
 from src.core.exceptions import (
-    UserAlreadyExistsException,
     InvalidEmailOrPasswordException,
+    UserAlreadyExistsException,
 )
-from src.accounts.security import create_access_token
 
 
 class AuthService:

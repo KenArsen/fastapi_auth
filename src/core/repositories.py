@@ -1,20 +1,21 @@
-from typing import Type, TypeVar, Sequence
+from collections.abc import Sequence
+from typing import TypeVar
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.core.models import Base
 
 T = TypeVar("T", bound=Base)
 
 
 class BaseRepository:
-    def __init__(self, model: Type[T], session: AsyncSession):
+    def __init__(self, model: type[T], session: AsyncSession):
         self.model = model
         self.session = session
 
     async def get_by_id(self, obj_id: int) -> T | None:
-        result = await self.session.execute(
-            select(self.model).where(self.model.id == obj_id)
-        )
+        result = await self.session.execute(select(self.model).where(self.model.id == obj_id))
         return result.scalar_one_or_none()
 
     async def create(self, obj: T) -> T:

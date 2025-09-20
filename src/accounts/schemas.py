@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from annotated_types import MinLen, MaxLen
+from annotated_types import MaxLen, MinLen
 from pydantic import BaseModel, EmailStr
 
 
@@ -31,11 +31,7 @@ class RegistrationIn(AuthBase):
 class LoginIn(AuthBase):
     password: Annotated[str, MinLen(1), MaxLen(100)]
 
-    model_config = {
-        "json_schema_extra": {
-            "example": {"email": "arsen@gmail.com", "password": "arsen2002"}
-        }
-    }
+    model_config = {"json_schema_extra": {"example": {"email": "arsen@gmail.com", "password": "arsen2002"}}}
 
 
 class MeOut(AuthBase):

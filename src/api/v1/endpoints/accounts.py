@@ -2,10 +2,10 @@ from fastapi import APIRouter, Response
 
 from src.accounts.dependencies import CurrentUserDep
 from src.accounts.repositories import AccountRepository
-from src.accounts.schemas import TokenOut, MeOut, RegistrationIn, LoginIn
+from src.accounts.schemas import LoginIn, MeOut, RegistrationIn, TokenOut
+from src.accounts.security import clear_access_token_cookie, set_access_token_cookie
 from src.accounts.services import AuthService
 from src.core.dependencies import DBSessionDep
-from src.accounts.security import set_access_token_cookie, clear_access_token_cookie
 
 router = APIRouter(prefix="/auth", tags=["Accounts"])
 

@@ -2,17 +2,17 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 
+from src.accounts.models import Account
+from src.accounts.repositories import AccountRepository
+from src.accounts.security import decode_access_token
 from src.core.config import settings
 from src.core.dependencies import DBSessionDep
 from src.core.exceptions import (
-    InvalidTokenPayloadException,
-    InvalidTokenException,
-    NotFoundException,
     AccessTokenMissingException,
+    InvalidTokenException,
+    InvalidTokenPayloadException,
+    NotFoundException,
 )
-from src.accounts.repositories import AccountRepository
-from src.accounts.models import Account
-from src.accounts.security import decode_access_token
 
 
 async def get_current_user(request: Request, session: DBSessionDep) -> Account:
@@ -25,8 +25,8 @@ async def get_current_user(request: Request, session: DBSessionDep) -> Account:
         email: str | None = payload.get("sub")
         if email is None:
             raise InvalidTokenPayloadException()
-    except Exception:
-        raise InvalidTokenException()
+    except Exception as err:
+        raise InvalidTokenException() from err
 
     dao = AccountRepository(session)
     user = await dao.get_by_email(email=email)

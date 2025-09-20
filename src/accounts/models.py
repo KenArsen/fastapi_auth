@@ -1,8 +1,8 @@
-from sqlalchemy import String
+from sqlalchemy import Enum as SQLEnum, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Enum as SQLEnum
-from src.core.models import Base, TimeStampMixin
+
 from src.accounts.enums import Role
+from src.core.models import Base, TimeStampMixin
 
 
 class Account(Base, TimeStampMixin):

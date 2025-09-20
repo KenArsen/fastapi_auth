@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from src.core.startup import AppInitializer
 
 

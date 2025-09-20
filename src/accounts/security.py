@@ -1,9 +1,9 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 import jwt
+from fastapi import Response
 from jwt import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext
-from fastapi import Response
 
 from src.core.config import settings
 from src.core.exceptions import InvalidTokenException
@@ -32,7 +32,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(subject: str) -> str:
     """Создание access-токена"""
     expire = get_expiration_time(settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload: Dict[str, Any] = {"sub": subject, "exp": expire}
+    payload: dict[str, Any] = {"sub": subject, "exp": expire}
 
     return jwt.encode(
         payload,
@@ -41,7 +41,7 @@ def create_access_token(subject: str) -> str:
     )
 
 
-def decode_access_token(token: str) -> Dict[str, Any]:
+def decode_access_token(token: str) -> dict[str, Any]:
     """Декодирование и валидация access-токена"""
     try:
         return jwt.decode(
@@ -49,18 +49,16 @@ def decode_access_token(token: str) -> Dict[str, Any]:
             settings.JWT_SECRET_KEY,
             algorithms=[settings.JWT_ALGORITHM],
         )
-    except ExpiredSignatureError:
-        raise InvalidTokenException()
-    except InvalidTokenError:
-        raise InvalidTokenException()
+    except ExpiredSignatureError as err:
+        raise InvalidTokenException() from err
+    except InvalidTokenError as err:
+        raise InvalidTokenException() from err
 
 
 # =======================
 # Cookies
 # =======================
-def set_access_token_cookie(
-        response: Response, token: str, max_age: Optional[int] = None
-) -> None:
+def set_access_token_cookie(response: Response, token: str, max_age: int | None = None) -> None:
     """Записать access-токен в cookie"""
     response.set_cookie(
         key=settings.JWT_ACCESS_COOKIE_NAME,

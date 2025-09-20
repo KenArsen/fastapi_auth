@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from src.api.v1 import router as v1_routers
 from src.core.config import settings
 from src.core.logger import setup_logging
-from src.api.v1 import router as v1_routers
 
 
 class AppInitializer:
