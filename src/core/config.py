@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     DB_PASS: str = "postgres"
 
     # CORS
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: Union[List[str], str] = ["*"]
 
     # Cookies / JWT
     COOKIE_SECURE: bool = False
