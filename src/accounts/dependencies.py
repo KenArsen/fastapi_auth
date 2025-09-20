@@ -12,7 +12,7 @@ from src.core.exceptions import (
 )
 from src.accounts.repositories import AccountRepository
 from src.accounts.models import Account
-from src.accounts.jwt import decode_access_token
+from src.accounts.security import decode_access_token
 
 
 async def get_current_user(request: Request, session: DBSessionDep) -> Account:

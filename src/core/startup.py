@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.core.config import settings
 from src.core.logger import setup_logging
-from src.accounts.api.v1 import router as accounts_router
+from src.api.v1 import router as v1_routers
 
 
 class AppInitializer:
@@ -27,4 +27,4 @@ class AppInitializer:
         setup_logging()
 
     def _setup_routers(self):
-        self.app.include_router(accounts_router, prefix="/api/v1")
+        self.app.include_router(v1_routers, prefix="/api/v1")

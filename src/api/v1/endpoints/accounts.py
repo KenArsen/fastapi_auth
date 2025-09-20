@@ -5,7 +5,7 @@ from src.accounts.repositories import AccountRepository
 from src.accounts.schemas import TokenOut, MeOut, RegistrationIn, LoginIn
 from src.accounts.services import AuthService
 from src.core.dependencies import DBSessionDep
-from src.accounts.cookies import set_access_token_cookie, clear_access_token_cookie
+from src.accounts.security import set_access_token_cookie, clear_access_token_cookie
 
 router = APIRouter(prefix="/auth", tags=["Accounts"])
 

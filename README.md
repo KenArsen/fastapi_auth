@@ -1,191 +1,174 @@
 # Auth Service (FastAPI)
 
-Небольшой сервис аутентификации на FastAPI с хранением пользователей в БД и авторизацией через JWT-токен в HttpOnly cookie.
+Небольшой сервис аутентификации и авторизации на FastAPI с использованием:
+- SQLAlchemy 2.x (async) + Alembic
+- Pydantic v2
+- JWT (PyJWT) с хранением access-токена в HttpOnly cookie
+- Хэширование паролей через passlib[bcrypt]
+- Логи в консоль и файл
 
-- Эндпоинты: регистрация, логин, логаут, текущий пользователь.
-- Хранение паролей в хэшированном виде.
-- JWT (HS256) хранится в защищённой cookie (HttpOnly, опционально Secure).
-- Поддержка CORS.
-- База данных: SQLite (по умолчанию) или PostgreSQL (asyncpg).
-- Миграции базы данных на Alembic.
-- Управление зависимостями через Poetry.
+Проект предоставляет базовые эндпоинты: регистрация, логин/логаут и получение текущего пользователя.
 
-## Стек
+## Содержание
+- Возможности
+- Технологии
+- Требования
+- Установка и запуск (локально)
+- Переменные окружения (.env)
+- База данных и миграции
+- Запуск через Makefile
+- Docker (замечание)
+- API и примеры запросов
+- Структура проекта
+
+## Возможности
+- Регистрация пользователя (email + пароль + username)
+- Логин: выдача JWT access-токена и установка его в HttpOnly cookie
+- Логаут: очистка cookie
+- Получение текущего пользователя по access-токену из cookie
+
+## Технологии
 - Python 3.12
-- FastAPI, Pydantic v2
-- SQLAlchemy (async) + Alembic
-- Uvicorn
-- Poetry
-- Docker (опционально)
+- FastAPI
+- SQLAlchemy (async) + aiosqlite (по умолчанию SQLite) или asyncpg (Postgres)
+- Alembic (миграции)
+- PyJWT
+- passlib[bcrypt]
 
-## Старт проекта
+## Требования
+- Python 3.12+
+- Poetry (для управления зависимостями)
 
-### 1) Клонирование и зависимости
-```bash
-git clone https://github.com/KenArsen/fastapi_auth.git
-cd fastapi_auth
+## Установка и запуск (локально)
+1) Клонируйте репозиторий и перейдите в папку проекта:
+   git clone https://github.com/KenArsen/fastapi_auth.git
+   cd fastapi_auth
 
-# Установите Poetry, если не установлен
-pip install poetry
+2) Установите зависимости:
+   pip install poetry
+   poetry install
 
-# Установка зависимостей
-poetry install
-```
+3) Создайте файл .env в корне проекта (см. раздел «Переменные окружения»).
 
-### 2) Настройка окружения
-Создайте файл .env в корне проекта на основе примера:
-```bash
-cp .env_example .env
-```
-Обязательно укажите секретный ключ JWT_SECRET_KEY — без него приложение не стартует.
+4) Выполните миграции БД:
+   alembic upgrade head
 
-Доступные переменные (.env):
-- DB_ENGINE=postgres | sqlite (по умолчанию sqlite)
-- DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS — для PostgreSQL
-- CORS_ORIGINS — список через запятую, например: http://localhost:3000,http://127.0.0.1:8000
-- COOKIE_SECURE=true|false — помечать ли cookie как Secure
-- JWT_ALGORITHM — по умолчанию HS256
-- JWT_SECRET_KEY — обязательный секрет
-- JWT_ACCESS_COOKIE_NAME — имя cookie с токеном (по умолчанию access_token)
-- JWT_ACCESS_TOKEN_EXPIRE_MINUTES — срок жизни Access Token в минутах (по умолчанию 30)
+5) Запустите приложение:
+   uvicorn src.main:app --reload
 
-### 3) База данных и миграции
-По умолчанию используется SQLite-файл sqlite.db в корне проекта — можно сразу запускать.
+Интерфейсы документации будут доступны по адресам:
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
-Для PostgreSQL укажите DB_ENGINE=postgres и параметры подключения,
-затем выполните миграции:
-```bash
-poetry run alembic upgrade head
-```
-Файлы миграций находятся в папке migrations/ (alembic.ini — в корне).
+## Переменные окружения (.env)
+Пример .env (минимально необходимы JWT_SECRET_KEY, остальное имеет значения по умолчанию):
 
-### 4) Запуск
-- Быстрый запуск через Makefile:
-```bash
+JWT_SECRET_KEY="your-very-secret-key"
+# sqlite | postgres
+DB_ENGINE=sqlite
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=app
+DB_USER=postgres
+DB_PASS=postgres
+
+# CORS. Можно строку со списком через запятую, либо оставить *
+CORS_ORIGINS=*
+
+# Cookie/JWT
+COOKIE_SECURE=false
+JWT_ALGORITHM=HS256
+JWT_ACCESS_COOKIE_NAME=access_token
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+Пояснения:
+- JWT_SECRET_KEY — обязателен (иначе приложение не запустится).
+- Для SQLite переменные DB_HOST/PORT/NAME/USER/PASS игнорируются; используется файл sqlite.db в корне.
+- Для Postgres укажите DB_ENGINE=postgres и корректные параметры подключения.
+
+## База данных и миграции
+- Конфигурация Alembic уже настроена (migrations/env.py берёт URL из настроек приложения).
+- Применить все миграции: alembic upgrade head
+- Откатить на одну миграцию: alembic downgrade -1
+- Текущая схема включает таблицу accounts со столбцами: id, role, username, email, password, created_at, updated_at.
+
+## Запуск через Makefile
+Упростить запуск можно командой:
 make run
-```
-- Либо напрямую через uvicorn:
-```bash
-poetry run uvicorn src.main:app --reload
-```
-После старта документация доступна по адресу:
-- Swagger: http://localhost:8000/docs
-- ReDoc:   http://localhost:8000/redoc
 
-Префикс API: /api/v1
+Она эквивалентна:
+uvicorn src.main:app --reload
 
-## Эндпоинты аутентификации
-Базовый путь: /api/v1/auth
+## Docker (замечание)
+В репозитории есть Dockerfile, однако в нём указана строка COPY ./app /code/app, в то время как исходный код находится в каталоге src/. Для корректной сборки образа рекомендуется либо:
+- заменить COPY ./app /code/app на COPY ./src /code/src в Dockerfile, либо
+- подготовить структуру /app с кодом внутри.
+
+Пример сборки/запуска после исправления COPY:
+- Сборка: docker build -t fastapi-auth .
+- Запуск: docker run -p 8080:8080 --env-file .env fastapi-auth
+
+По умолчанию CMD запускает Uvicorn на порту 8080. Документация будет доступна на http://127.0.0.1:8080/docs.
+
+## API и примеры запросов
+Базовый префикс: /api/v1
+
+Эндпоинты аккаунтов: /api/v1/auth
 
 1) Регистрация
-- POST /api/v1/auth/register/
-- Request body (application/json):
-```json
+POST /api/v1/auth/register/
+Body (JSON):
 {
   "email": "user@example.com",
-  "password": "your_password",
-  "username": "optional_name"
+  "password": "strong-pass",
+  "username": "john"
 }
-```
-- Response 200 (application/json):
-```json
-{
-  "id": 1,
-  "email": "user@example.com",
-  "username": "optional_name"
-}
-```
+Ответ: 200 OK (данные пользователя без пароля)
 
 2) Логин
-- POST /api/v1/auth/login/
-- Request body:
-```json
+POST /api/v1/auth/login/
+Body (JSON):
 {
   "email": "user@example.com",
-  "password": "your_password"
+  "password": "strong-pass"
 }
-```
-- Response 200:
-```json
+Ответ: 200 OK
 {
-  "access_token": "<JWT>",
+  "access_token": "...",
   "token_type": "bearer"
 }
-```
-Одновременно в ответе устанавливается HttpOnly cookie с access_token
-(имя cookie задаётся переменной JWT_ACCESS_COOKIE_NAME).
+Дополнительно сервер установит HttpOnly cookie с именем из JWT_ACCESS_COOKIE_NAME (по умолчанию access_token).
 
-3) Логаут
-- POST /api/v1/auth/logout/
-- Очищает cookie с токеном. Ответ:
-```json
-{ "detail": "Successfully logged out" }
-```
-
-4) Текущий пользователь
-- GET /api/v1/auth/me/
-- Требуется валидная cookie с access_token.
-- Response 200:
-```json
-{
-  "id": 1,
-  "email": "user@example.com",
-  "username": "optional_name"
-}
-```
-
-### Примеры curl
-- Регистрация:
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/register/ \
+Пример curl (cookie сохраняется):
+- Вход: curl -i -c cookies.txt -X POST http://127.0.0.1:8000/api/v1/auth/login/ \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"secret","username":"user"}'
-```
+  -d '{"email":"user@example.com","password":"strong-pass"}'
 
-- Логин (с сохранением cookie):
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/login/ \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{"email":"user@example.com","password":"secret"}'
-```
+3) Текущий пользователь (me)
+GET /api/v1/auth/me/
+Требуется установленный HttpOnly cookie access_token (например, после логина):
+- Пример: curl -b cookies.txt http://127.0.0.1:8000/api/v1/auth/me/
 
-- Текущий пользователь (используя cookie из логина):
-```bash
-curl http://localhost:8000/api/v1/auth/me/ -b cookies.txt
-```
+4) Логаут
+POST /api/v1/auth/logout/
+Очищает cookie access_token на клиенте.
 
-- Логаут:
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/logout/ -b cookies.txt -c cookies.txt
-```
+Коды ошибок:
+- 400 — Пользователь уже существует при регистрации
+- 401 — Неверные учётные данные / отсутствие токена / недействительный токен
+- 404 — Пользователь не найден (например, если удалён)
 
-## Конфигурация и важные детали
-- CORS: список доменов настраивается через CORS_ORIGINS. Значение-строка
-  автоматически разбивается по запятой.
-- JWT_SECRET_KEY обязателен. Без него Settings валидатор поднимет ошибку при старте.
-- COOKIE_SECURE: на проде выставляйте true, чтобы cookie передавались только по HTTPS.
-- Имя cookie и время жизни настраиваются через переменные окружения.
+## Структура проекта (основное)
+- src/main.py — создание FastAPI-приложения
+- src/core — конфигурация, БД, зависимости, исключения, логирование, базовые модели и репозитории, инициализация приложения
+- src/accounts — модели, схемы, репозитории, сервисы, безопасность (JWT, cookie), зависимости
+- src/api/v1 — маршрутизация и эндпоинты
+- migrations — Alembic миграции
 
-## Docker
-Пример сборки и запуска:
-```bash
-docker build -t fastapi-auth .
-docker run -p 8080:8080 --env-file .env fastapi-auth
-```
-Сервис стартует на 0.0.0.0:8080, команда запуска внутри контейнера:
-```bash
-uvicorn src.main:app --host 0.0.0.0 --port 8080
-```
-Примечание: убедитесь, что в образ попадает исходный код (папка `src`).
-Текущий Dockerfile может требовать корректировки COPY для вашей среды.
-
-## Структура проекта (важное)
-- src/main.py — создание FastAPI приложения
-- src/core/* — конфиг, логгер, инициализация CORS/роутов, БД
-- src/accounts/* — модели, схемы, репозитории и сервисы аккаунтов, API v1
-- migrations/*, alembic.ini — миграции базы данных
-- Makefile — утилитарные команды
+## Полезные заметки
+- Токен — это JWT c subject=sub=email и временем жизни exp из JWT_ACCESS_TOKEN_EXPIRE_MINUTES.
+- Токен хранится в HttpOnly cookie, что снижает риски XSS. Для продакшена установите COOKIE_SECURE=true и настройте CORS_ORIGINS под ваши домены.
+- Логи пишутся в logs/app.log и в консоль.
 
 ## Лицензия
-MIT (или укажите вашу лицензию, если иная).
+MIT (или укажите вашу лицензию).

@@ -6,7 +6,7 @@ from src.core.exceptions import (
     UserAlreadyExistsException,
     InvalidEmailOrPasswordException,
 )
-from src.accounts.jwt import create_access_token
+from src.accounts.security import create_access_token
 
 
 class AuthService:
