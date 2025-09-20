@@ -3,19 +3,19 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from src.core.config import settings
-from src.dependencies.dao_dep import SessionDep
+from src.core.dependencies import DBSessionDep
 from src.core.exceptions import (
     InvalidTokenPayloadException,
     InvalidTokenException,
     NotFoundException,
     AccessTokenMissingException,
 )
-from src.dao.user import AccountDAO
-from src.models.user import Account
-from src.utils.jwt_helpers import decode_access_token
+from src.accounts.repositories import AccountRepository
+from src.accounts.models import Account
+from src.accounts.jwt import decode_access_token
 
 
-async def get_current_user(request: Request, session: SessionDep) -> Account:
+async def get_current_user(request: Request, session: DBSessionDep) -> Account:
     token = request.cookies.get(settings.JWT_ACCESS_COOKIE_NAME)
     if not token:
         raise AccessTokenMissingException()
@@ -28,7 +28,7 @@ async def get_current_user(request: Request, session: SessionDep) -> Account:
     except Exception:
         raise InvalidTokenException()
 
-    dao = AccountDAO(session)
+    dao = AccountRepository(session)
     user = await dao.get_by_email(email=email)
     if not user:
         raise NotFoundException("User")

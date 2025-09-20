@@ -1,13 +1,13 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Enum as SQLEnum
-from src.models.base import Base, TimeStampMixin
-from src.models.enam import Role
+from src.core.models import Base, TimeStampMixin
+from src.accounts.enums import Role
 
 
 class Account(Base, TimeStampMixin):
     role: Mapped[Role] = mapped_column(SQLEnum(Role), server_default=Role.USER)
-    username: Mapped[str] = mapped_column(String(100), nullable=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
 
