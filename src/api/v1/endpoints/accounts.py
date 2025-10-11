@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Depends
 
 from src.accounts.dependencies import CurrentUserDep
+from src.accounts.permission import require_manager
 from src.accounts.repositories import AccountRepository
 from src.accounts.schemas import LoginIn, MeOut, RegistrationIn, TokenOut
 from src.accounts.security import clear_access_token_cookie, set_access_token_cookie
@@ -35,3 +36,8 @@ async def logout(response: Response):
 @router.get("/me/", response_model=MeOut)
 async def me(current_user: CurrentUserDep):
     return current_user
+
+
+@router.get("/books/", dependencies=[Depends(require_manager)])
+async def books(current_user: CurrentUserDep):
+    return {"books": "books"}
