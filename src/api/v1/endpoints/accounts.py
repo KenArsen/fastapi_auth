@@ -5,20 +5,20 @@ from src.accounts.repositories import AccountRepository
 from src.accounts.schemas import LoginIn, MeOut, RegistrationIn, TokenOut
 from src.accounts.security import clear_access_token_cookie, set_access_token_cookie
 from src.accounts.services import AuthService
-from src.core.dependencies import DBSessionDep
+from src.core.dependencies import SessionDep
 
 router = APIRouter(prefix="/auth", tags=["Accounts"])
 
 
 @router.post("/register/", response_model=MeOut)
-async def register(session: DBSessionDep, data: RegistrationIn):
+async def register(session: SessionDep, data: RegistrationIn):
     dao = AccountRepository(session)
     service = AuthService(dao)
     return await service.register(data)
 
 
 @router.post("/login/", response_model=TokenOut)
-async def login(response: Response, session: DBSessionDep, data: LoginIn):
+async def login(response: Response, session: SessionDep, data: LoginIn):
     dao = AccountRepository(session)
     service = AuthService(dao)
     token = await service.login(data)
